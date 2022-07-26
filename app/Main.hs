@@ -1,7 +1,9 @@
 module Main where
 
 import DataSet (loadData)
+import Preprocess (parseCorpus)
 import Prelude
 
 main :: IO ()
-main = print loadData
+main = do
+  print $ parseCorpus loadData
