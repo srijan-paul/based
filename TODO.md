@@ -1,0 +1,2 @@
+- [ ] Add doc comments for all the functions and modules
+- [ ] Add tests for Preprocess.hs

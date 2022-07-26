@@ -2,7 +2,7 @@ module Preprocess (parseCorpus, ParsedCorpus) where
 
 import qualified Data.Bifunctor as Bifunctor
 import Data.Char (isSpace)
-import DataSet (Corpus, Label)
+import DataSet (Corpus, MailLabel(..))
 
 isWordDelimiter :: Char -> Bool
 isWordDelimiter x = isSpace x || x `elem` punctuations
@@ -153,7 +153,13 @@ removeStopWords = filter (`notElem` stopWords)
 preprocessString :: String -> [String]
 preprocessString = removeStopWords . tokenize
 
-type ParsedCorpus = [([String], Label)]
+type ParsedCorpus = [([String], MailLabel)]
 
+-- | Preprocess the string by extracting out words and removing stop words and punctuation
+-- __Examples:__
+--
+-- >>> parseCorpus [("hot singles your area", Spam)] 
+-- [(["hot","singles","area"],Spam)]
+--
 parseCorpus :: Corpus -> ParsedCorpus
 parseCorpus = map (Bifunctor.first preprocessString)
