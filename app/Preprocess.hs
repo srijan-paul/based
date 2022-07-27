@@ -7,8 +7,14 @@ import DataSet (Corpus, MailLabel(..))
 isWordDelimiter :: Char -> Bool
 isWordDelimiter x = isSpace x || x `elem` punctuations
   where
-    punctuations = [',', '.', '?', '!', '-', ';', '\'', '"', '(', ')', '[', ']']
+    punctuations = ",.!?;:'\"&-+-()[]=" 
 
+-- | Return a list of words in a string.
+-- __Examples:__
+--
+-- >>> tokenize "Hey! click here for free coupons :)" 
+-- ["Hey","click","here","for","free","coupons"]
+-- 
 tokenize :: String -> [String]
 tokenize s = case dropWhile isWordDelimiter s of
   "" -> []
