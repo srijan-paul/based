@@ -10,7 +10,7 @@ type Corpus = [(String, MailLabel)]
 
 loadData :: Corpus
 loadData =
-  [ ("free hot robux", Spam),
+  [ ("free robux", Spam),
     ("newsletter update", Ham),
     ("hot singles in your area", Spam)
   ]

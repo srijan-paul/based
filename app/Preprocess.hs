@@ -1,20 +1,19 @@
-module Preprocess (parseCorpus, ParsedCorpus) where
+module Preprocess (parseCorpus, ParsedCorpus (..), preprocessString) where
 
 import qualified Data.Bifunctor as Bifunctor
-import Data.Char (isSpace)
-import DataSet (Corpus, MailLabel(..))
+import Data.Char (isSpace, toLower)
+import DataSet (Corpus, MailLabel (..))
 
 isWordDelimiter :: Char -> Bool
 isWordDelimiter x = isSpace x || x `elem` punctuations
   where
-    punctuations = ",.!?;:'\"&-+-()[]=" 
+    punctuations = ",.!?;:'\"&-+-()[]="
 
 -- | Return a list of words in a string.
 -- __Examples:__
 --
--- >>> tokenize "Hey! click here for free coupons :)" 
+-- >>> tokenize "Hey! click here for free coupons :)"
 -- ["Hey","click","here","for","free","coupons"]
--- 
 tokenize :: String -> [String]
 tokenize s = case dropWhile isWordDelimiter s of
   "" -> []
@@ -157,15 +156,16 @@ removeStopWords :: [String] -> [String]
 removeStopWords = filter (`notElem` stopWords)
 
 preprocessString :: String -> [String]
-preprocessString = removeStopWords . tokenize
+preprocessString = makeStringLower . removeStopWords . tokenize
+  where
+    makeStringLower = map (map toLower)
 
 type ParsedCorpus = [([String], MailLabel)]
 
 -- | Preprocess the string by extracting out words and removing stop words and punctuation
 -- __Examples:__
 --
--- >>> parseCorpus [("hot singles your area", Spam)] 
+-- >>> parseCorpus [("hot singles in your area", Spam)]
 -- [(["hot","singles","area"],Spam)]
---
 parseCorpus :: Corpus -> ParsedCorpus
 parseCorpus = map (Bifunctor.first preprocessString)
