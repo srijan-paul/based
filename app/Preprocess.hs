@@ -3,11 +3,12 @@ module Preprocess (parseCorpus, ParsedCorpus (..), preprocessString) where
 import qualified Data.Bifunctor as Bifunctor
 import Data.Char (isSpace, toLower)
 import DataSet (Corpus, MailLabel (..))
+import Data.List (intercalate)
 
 isWordDelimiter :: Char -> Bool
 isWordDelimiter x = isSpace x || x `elem` punctuations
   where
-    punctuations = ",.!?;:'\"&-+-()[]="
+    punctuations = ",.!?;:'\"&-+-()[]=_"
 
 -- | Return a list of words in a string.
 -- __Examples:__
@@ -153,7 +154,7 @@ stopWords =
   ]
 
 removeStopWords :: [String] -> [String]
-removeStopWords = filter (`notElem` stopWords)
+removeStopWords = filter (\x -> notElem x stopWords && (length x > 2))
 
 preprocessString :: String -> [String]
 preprocessString = makeStringLower . removeStopWords . tokenize
