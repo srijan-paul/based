@@ -105,11 +105,8 @@ main :: IO ()
 main = do
   (trainSet, testSet) <- loadCorpus 0.9
   print $ mapPairs length (trainSet, testSet)
-  let model = parseCorpus trainSet
-  print "tch"
-  -- print model
-
--- print $ findAccuracy model testSet
+  let model = train $ parseCorpus trainSet
+  print $ findAccuracy model testSet
 
 -- d <- loadDummyData
 -- print $ getClassProbs (train $ parseCorpus d) "free"

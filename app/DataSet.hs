@@ -4,19 +4,20 @@
 module DataSet (loadData, loadDummyData, Corpus, MailLabel (..), splitDataSet) where
 
 import Control.Applicative (liftA2)
-import Control.Monad
+import Control.Exception (IOException, catch)
+import Control.Monad (MonadPlus (mzero))
 import qualified Data.Bifunctor as Bifunctor
 import qualified Data.Bitraversable as Bifunctor
 import Data.Csv (FromField (..), HasHeader (HasHeader), decode)
+import Data.Encoding.UTF8
 import Data.List (partition)
 import Data.Maybe (Maybe (..))
+import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
 import qualified Data.Vector as V
 import System.Directory (doesDirectoryExist)
 import System.Directory.Recursive (getFilesRecursive)
 import System.FilePath ((</>))
-import qualified System.IO.Encoding as IO
-import Data.Encoding.UTF8
-
 
 -- Loads the training data from the CSDMC2010SPAM corpus
 -- For now though, this is a stub module that returns dummy data :p
@@ -31,7 +32,9 @@ instance FromField MailLabel where
     | otherwise = mzero
 
 type CorpusItem = (String, MailLabel)
+
 type Corpus = [CorpusItem]
+
 type CSVEntry = (Int, MailLabel, String, Int)
 
 loadData :: String -> IO Corpus
@@ -42,11 +45,13 @@ loadData dirPath = do
   hamCorpus <- readCorpus Ham hamDir
   return (spamCorpus ++ hamCorpus)
   where
+    readFileSafe :: FilePath -> IO String
+    readFileSafe path = catch (T.unpack <$> TIO.readFile path) (\e -> return $ "ERROR: " ++ show (e :: IOException))
+
     readCorpus :: MailLabel -> FilePath -> IO Corpus
     readCorpus label dir = do
-      -- let ?enc = UTF8
       filePaths <- getFilesRecursive dir
-      contents <- mapM readFile filePaths
+      contents <- mapM readFileSafe filePaths
       return $ map (,label) contents
 
 -- where
